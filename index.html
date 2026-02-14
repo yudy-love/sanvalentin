@@ -3,130 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mi Caballero Favorito</title>
+    <title>Para mi Caballero</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        #canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .container {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            pointer-events: none;
-        }
-
-        .header-box {
+        body { margin: 0; background-color: #000; overflow: hidden; font-family: sans-serif; }
+        #canvas-container { width: 100vw; height: 100vh; }
+        
+        /* Caja de mensaje superior igual a la imagen */
+        .top-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-        }
-
-        h1 { font-size: 1.5rem; margin: 0; font-weight: 300; }
-        
-        .floating-text {
-            position: absolute;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 100;
             white-space: nowrap;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
-            animation: move linear infinite;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
 
-        @keyframes move {
-            from { transform: translate(0, 0); }
-            to { transform: translate(var(--x), var(--y)); }
+        /* Reproductor falso en la parte inferior para estética */
+        .player-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(40, 40, 40, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="canvas"></canvas>
+    <div class="top-message">Te Amo Muchote Mi Rey 💛</div>
 
-    <div class="container">
-        <div class="header-box">
-            <h1>Eres mi universo favorito 🌌💙</h1>
+    <div id="canvas-container"></div>
+
+    <div class="player-bar">
+        <div style="font-size: 0.8rem;">
+            <b>Canción para ti</b><br>
+            Nuestra_historia.mp3 💙🌹
         </div>
+        <button style="background: #fff; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold;">Elegir</button>
     </div>
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, particles;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        // --- PERSONALIZA TUS FRASES AQUÍ ---
-        const phrases = [
-            "Mi Rey 👑", "Mi lugar seguro", "Te admiro tanto", "Mi compañero de vida", 
-            "El más guapo 😍", "Gracias por existir", "Mi persona favorita", 
-            "Mi todo 🌍", "Eres increíble", "Te amo infinito", "Mi caballero", 
-            "Mi mayor orgullo", "Esa sonrisa... ✨", "Juntos siempre"
+    <script>
+        let scene, camera, renderer, cloud;
+        const messages = [
+            "Mi Todo 🌍", "Mi Rey 👑", "El más guapo", "Te Amo", "Mi Paz", 
+            "Mi Caballero", "Eres Único", "Mi Vida", "Te Admiro", "Mi Compañero",
+            "Mi Destino", "Gracias por estar", "Mi Amor Infinito", "Mi Tesoro"
         ];
 
         function init() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            particles = [];
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
 
-            for (let i = 0; i < 100; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    size: Math.random() * 2
-                });
-            }
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Crear el núcleo central (la esfera negra de la imagen)
+            const geometry = new THREE.SphereGeometry(0.8, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const core = new THREE.Mesh(geometry, material);
+            scene.add(core);
+
+            // Brillo alrededor del núcleo
+            const glowGeo = new THREE.SphereGeometry(0.85, 32, 32);
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0x8844ff, transparent: true, opacity: 0.3 });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            scene.add(glow);
+
+            // Crear los textos flotantes como partículas
+            cloud = new THREE.Group();
             
-            // Crear textos flotantes
-            phrases.forEach(phrase => {
-                const el = document.createElement('div');
-                el.className = 'floating-text';
-                el.innerText = phrase;
-                el.style.left = Math.random() * 100 + 'vw';
-                el.style.top = Math.random() * 100 + 'vh';
-                el.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
-                el.style.setProperty('--y', (Math.random() - 0.5) * 200 + 'px');
-                el.style.animationDuration = (Math.random() * 10 + 5) + 's';
-                document.body.appendChild(el);
+            messages.forEach((text) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 256;
+                canvas.height = 64;
+                ctx.fillStyle = 'white';
+                ctx.font = 'Bold 30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(text, 128, 40);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                const sprite = new THREE.Sprite(spriteMat);
+
+                // Posición aleatoria en una esfera
+                const phi = Math.acos(-1 + (Math.random() * 2));
+                const theta = Math.random() * Math.PI * 2;
+                const radius = 2 + Math.random() * 2;
+
+                sprite.position.x = radius * Math.sin(phi) * Math.cos(theta);
+                sprite.position.y = radius * Math.sin(phi) * Math.sin(theta);
+                sprite.position.z = radius * Math.cos(phi);
+                
+                sprite.scale.set(1, 0.25, 1);
+                cloud.add(sprite);
             });
+
+            scene.add(cloud);
+
+            // Estrellas de fondo
+            const starGeo = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const posArray = new Float32Array(starCount * 3);
+            for(let i=0; i<starCount*3; i++) { posArray[i] = (Math.random() - 0.5) * 10; }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const starMat = new THREE.PointsMaterial({ size: 0.005, color: 0xffffff });
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = 'white';
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.x < 0 || p.x > width) p.vx *= -1;
-                if (p.y < 0 || p.y > height) p.vy *= -1;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            requestAnimationFrame(draw);
+        function animate() {
+            requestAnimationFrame(animate);
+            cloud.rotation.y += 0.002; // Hace que los mensajes giren
+            cloud.rotation.x += 0.001;
+            renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', init);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
         init();
-        draw();
+        animate();
     </script>
 </body>
 </html>
