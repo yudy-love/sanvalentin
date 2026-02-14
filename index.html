@@ -9,21 +9,27 @@
 body{
   margin:0;
   overflow:hidden;
-  background: radial-gradient(circle at center, #2b0050, #000000);
-  font-family: Arial, sans-serif;
+  background:black;
+  font-family:Arial, sans-serif;
   color:white;
 }
 
-/* Mensaje superior */
-.titulo{
+/* Fondo galaxia */
+canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:-1;
+}
+
+/* Mensaje central */
+.mensaje{
   position:absolute;
-  top:20px;
   width:100%;
   text-align:center;
-  font-size:22px;
-  background:rgba(255,255,255,0.1);
-  padding:10px;
-  border-radius:20px;
+  top:40%;
+  font-size:26px;
+  text-shadow:0 0 20px #ff00ff;
 }
 
 /* Palabras flotando */
@@ -31,39 +37,61 @@ body{
   position:absolute;
   font-size:14px;
   opacity:0.8;
-  animation: flotar linear infinite;
+  animation: subir linear infinite;
 }
 
-@keyframes flotar{
-  from{
-    transform: translateY(100vh);
-  }
-  to{
-    transform: translateY(-10vh);
-  }
+@keyframes subir{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-10vh);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="titulo">
-Te amo mi esposito hermoso 💜✨
+<canvas id="galaxia"></canvas>
+
+<div class="mensaje">
+Te amo mi esposito hermoso 💜<br>
+Eres mi universo entero 🌌✨
 </div>
 
 <script>
 
+/* GALAXIA */
+const canvas = document.getElementById("galaxia");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+for(let i=0;i<200;i++){
+  stars.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    size: Math.random()*2
+  });
+}
+
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(star=>{
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+
+draw();
+
+/* Palabras flotando */
 const palabras = [
-"Mi Amor 💜",
-"Mi Vida 💕",
-"Mi Rey 👑",
-"Mi Universo 🌌",
-"Mi Corazón 💖",
-"Mi Todo ✨",
-"Único 💛",
-"Mi Cielo 🌙",
-"Mi Tesoro 💎",
-"Siempre Tú 💞"
+"Mi Amor 💜","Mi Vida 💕","Mi Rey 👑",
+"Mi Universo 🌌","Mi Corazón 💖","Mi Todo ✨"
 ];
 
 function crearPalabra(){
@@ -71,15 +99,13 @@ function crearPalabra(){
   palabra.className="palabra";
   palabra.innerText=palabras[Math.floor(Math.random()*palabras.length)];
   palabra.style.left=Math.random()*100+"vw";
-  palabra.style.animationDuration=(10+Math.random()*15)+"s";
+  palabra.style.animationDuration=(8+Math.random()*10)+"s";
   document.body.appendChild(palabra);
 
-  setTimeout(()=>{
-    palabra.remove();
-  },20000);
+  setTimeout(()=>{palabra.remove();},15000);
 }
 
-setInterval(crearPalabra,500);
+setInterval(crearPalabra,600);
 
 </script>
 
