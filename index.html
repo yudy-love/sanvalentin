@@ -5,156 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para Mi Rey 💙</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             overflow: hidden; 
-            background: #050a2a; 
+            background: #101030; 
             width: 100vw; 
             height: 100vh;
         }
 
-        /* Círculo central */
-        #central-dot {
+        #center-circle {
             position: absolute;
             top: 30%;
             left: 50%;
             transform: translateX(-50%);
-            width: 130px;
-            height: 130px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             background: #000;
-            box-shadow: 0 0 30px rgba(0, 183, 255, 0.6);
-            z-index: 3;
+            box-shadow: 0 0 30px #00aaff;
+            z-index: 2;
         }
 
-        /* Contenedor de frases */
-        #phrases-wrap {
+        #phrases {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2;
+            z-index: 1;
         }
 
-        /* Frases - estilo como en la imagen */
-        .phrase {
+        .word {
             position: absolute;
-            color: #8ee5ff;
-            font-size: 13px;
-            text-shadow: 0 0 4px #8ee5ff;
-            transition: all 0.2s ease;
+            color: #a0e0ff;
+            font-family: Arial;
+            font-size: 14px;
+            animation: spin 20s linear infinite;
         }
 
-        /* Reproductor */
-        #audio-bar {
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #player {
             position: absolute;
-            bottom: 10px;
+            bottom: 20px;
             left: 5%;
             width: 90%;
-            background: rgba(0, 51, 102, 0.8);
+            background: #0055aa;
             padding: 10px;
             border-radius: 10px;
-            z-index: 4;
         }
 
-        #select-btn {
+        #choose {
             width: 100%;
             padding: 8px;
-            background: #00aaff;
-            color: #000;
+            background: #a0e0ff;
             border: none;
             border-radius: 5px;
             margin-bottom: 8px;
             cursor: pointer;
         }
 
-        #file-in { display: none; }
-        audio { width: 100%; height: 40px; }
+        #file { display: none; }
+        audio { width: 100%; }
     </style>
 </head>
 <body>
-    <div id="central-dot"></div>
-    <div id="phrases-wrap"></div>
+    <div id="center-circle"></div>
+    <div id="phrases"></div>
 
-    <div id="audio-bar">
-        <button id="select-btn">Seleccionar Canción 🎵</button>
-        <input type="file" id="file-in" accept="audio/*">
-        <audio id="audio-player" controls>
+    <div id="player">
+        <button id="choose">Seleccionar Canción 🎵</button>
+        <input type="file" id="file" accept="audio/*">
+        <audio controls>
     </div>
 
     <script>
-        // Frases para hombre con emojis
-        const phrasesList = [
-            "Mi Rey 👑", "Mi Héroe ⚔️", "Mi Mundo 🌍", "Mi Todo 💙", 
-            "Te Amo 💖", "Mi Fuerza 💪", "Mi Paz 🧘", "Sueños ✨", 
-            "Mi Eterno ⏳", "Mi Refugio 🏠", "Mi Calma 🧘", "Mi Estrella ✨",
-            "Mi Campeón 🏆", "Unico 💎", "Mi Vida ❤️", "Mi Pasión 🔥",
-            "Mi Alegría 😄", "Mi Protector 🛡️", "Mi Cielo ☁️", "Mi Bebé 🥰",
-            "Mi Gran Amor 💖", "Mi Razón 🤔", "Mi Esperanza ✨", "Mi Paraíso 🏝️",
-            "Mi Fiesta 🎉", "Mi Destino ⭐", "Mi Inspiración 💡", "Mi Campeón 🏆"
+        const words = [
+            "Mi Héroe", "Mi Rey", "Mi Guerrero", "Mi Mundo",
+            "Te Amo", "Mi Todo", "Mi Fuerza", "Mi Paz",
+            "Sueños", "Mi Eterno", "Mi Refugio", "Mi Calma"
         ];
 
-        const wrap = document.getElementById('phrases-wrap');
-        const dot = document.getElementById('central-dot');
-        const dotX = dot.offsetLeft + dot.offsetWidth/2;
-        const dotY = dot.offsetTop + dot.offsetHeight/2;
+        const phrases = document.getElementById('phrases');
+        const center = {x: window.innerWidth/2, y: window.innerHeight/3};
 
-        // Crear MUCHAS frases para llenar la pantalla
-        for(let i=0; i<80; i++){
-            const p = document.createElement('div');
-            p.className = 'phrase';
-            p.innerText = phrasesList[Math.floor(Math.random()*phrasesList.length)];
-            
-            // Posición inicial aleatoria
-            const rad = 50 + Math.random()*250;
-            const ang = Math.random()*Math.PI*2;
-            p.style.left = (dotX + Math.cos(ang)*rad) + 'px';
-            p.style.top = (dotY + Math.sin(ang)*rad) + 'px';
-            
-            // Velocidad y dirección de movimiento
-            p.speed = 0.01 + Math.random()*0.02;
-            p.ang = ang;
-            p.rad = rad;
-            wrap.appendChild(p);
+        words.forEach((text, i) => {
+            const word = document.createElement('div');
+            word.className = 'word';
+            word.textContent = text;
+            const radius = 100 + i*30;
+            let angle = 0;
 
-            // Función de movimiento CONTINUO
-            function movePhrase(el) {
-                el.ang += el.speed;
-                const x = dotX + Math.cos(el.ang)*el.rad;
-                const y = dotY + Math.sin(el.ang)*el.rad;
-                el.style.left = x + 'px';
-                el.style.top = y + 'px';
+            setInterval(() => {
+                angle += 0.01;
+                const x = center.x + Math.cos(angle)*radius;
+                const y = center.y + Math.sin(angle)*radius;
+                word.style.left = x + 'px';
+                word.style.top = y + 'px';
+                
+                const dist = Math.hypot(x - center.x, y - center.y);
+                if(dist < 80) word.style.color = '#ffff00';
+                else word.style.color = '#a0e0ff';
 
-                // Cambiar color al pasar cerca del círculo
-                const dist = Math.hypot(
-                    x + el.offsetWidth/2 - dotX, 
-                    y + el.offsetHeight/2 - dotY
-                );
-                if(dist < 80){
-                    el.style.color = '#ffdd00';
-                    el.style.textShadow = '0 0 6px #ffdd00';
-                } else {
-                    el.style.color = '#8ee5ff';
-                    el.style.textShadow = '0 0 4px #8ee5ff';
-                }
-                requestAnimationFrame(() => movePhrase(el));
-            }
-            movePhrase(p);
-        }
-
-        // Reproductor de audio
-        document.getElementById('select-btn').addEventListener('click', () => {
-            document.getElementById('file-in').click();
+            }, 20);
+            phrases.appendChild(word);
         });
 
-        document.getElementById('file-in').addEventListener('change', (e) => {
+        document.getElementById('choose').onclick = () => document.getElementById('file').click();
+        document.getElementById('file').onchange = (e) => {
             const file = e.target.files[0];
-            if(file){
-                const url = URL.createObjectURL(file);
-                document.getElementById('audio-player').src = url;
-            }
-        });
+            if(file) document.querySelector('audio').src = URL.createObjectURL(file);
+        };
     </script>
 </body>
 </html>
