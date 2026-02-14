@@ -3,110 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi Universo 💜</title>
-
+<title>Jairo 💜</title>
 <style>
 body{
   margin:0;
   overflow:hidden;
   background:black;
   font-family:Arial, sans-serif;
-  color:white;
 }
-
-/* Fondo galaxia */
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:-1;
-}
-
-/* Mensaje central */
-.mensaje{
+#texto{
   position:absolute;
-  width:100%;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:50px;
+  color:#ff4dff;
+  text-shadow:0 0 30px #ff00ff;
+  z-index:1;
   text-align:center;
-  top:40%;
-  font-size:26px;
-  text-shadow:0 0 20px #ff00ff;
-}
-
-/* Palabras flotando */
-.palabra{
-  position:absolute;
-  font-size:14px;
-  opacity:0.8;
-  animation: subir linear infinite;
-}
-
-@keyframes subir{
-  from{transform:translateY(100vh);}
-  to{transform:translateY(-10vh);}
 }
 </style>
 </head>
-
 <body>
 
-<canvas id="galaxia"></canvas>
-
-<div class="mensaje">
-Te amo mi esposito hermoso 💜<br>
-Eres mi universo entero 🌌✨
+<div id="texto">
+💜<br>Jairo
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <script>
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+let renderer = new THREE.WebGLRenderer({alpha:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-/* GALAXIA */
-const canvas = document.getElementById("galaxia");
-const ctx = canvas.getContext("2d");
+/* Galaxia de estrellas 3D */
+let starsGeometry = new THREE.BufferGeometry();
+let starsCount = 4000;
+let positions = new Float32Array(starsCount * 3);
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+for(let i=0;i<starsCount*3;i++){
+  positions[i] = (Math.random()-0.5) * 1500;
+}
 
-let stars = [];
+starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions,3));
+let starsMaterial = new THREE.PointsMaterial({color:0xffffff});
+let stars = new THREE.Points(starsGeometry, starsMaterial);
+scene.add(stars);
 
-for(let i=0;i<200;i++){
-  stars.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    size: Math.random()*2
+/* Corazones flotando 3D */
+let corazones = [];
+let texture = new THREE.TextureLoader().load("https://i.imgur.com/9yG3XQp.png");
+let material = new THREE.SpriteMaterial({ map: texture });
+
+for(let i=0;i<20;i++){
+  let sprite = new THREE.Sprite(material);
+  sprite.position.set(
+    (Math.random()-0.5)*400,
+    (Math.random()-0.5)*400,
+    (Math.random()-0.5)*400
+  );
+  sprite.scale.set(30,30,1);
+  scene.add(sprite);
+  corazones.push(sprite);
+}
+
+camera.position.z = 300;
+
+/* Movimiento con dedo */
+document.addEventListener("mousemove", e=>{
+  let x = (e.clientX/window.innerWidth - 0.5)*2;
+  let y = (e.clientY/window.innerHeight - 0.5)*2;
+  camera.position.x = x*50;
+  camera.position.y = -y*50;
+});
+
+document.addEventListener("touchmove", e=>{
+  let touch = e.touches[0];
+  let x = (touch.clientX/window.innerWidth - 0.5)*2;
+  let y = (touch.clientY/window.innerHeight - 0.5)*2;
+  camera.position.x = x*50;
+  camera.position.y = -y*50;
+});
+
+/* Animación */
+function animate(){
+  requestAnimationFrame(animate);
+  stars.rotation.y += 0.0005;
+  corazones.forEach(c=>{
+    c.rotation += 0.01;
   });
+  renderer.render(scene,camera);
 }
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="white";
-  stars.forEach(star=>{
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
-    ctx.fill();
-  });
-  requestAnimationFrame(draw);
-}
-
-draw();
-
-/* Palabras flotando */
-const palabras = [
-"Mi Amor 💜","Mi Vida 💕","Mi Rey 👑",
-"Mi Universo 🌌","Mi Corazón 💖","Mi Todo ✨"
-];
-
-function crearPalabra(){
-  const palabra=document.createElement("div");
-  palabra.className="palabra";
-  palabra.innerText=palabras[Math.floor(Math.random()*palabras.length)];
-  palabra.style.left=Math.random()*100+"vw";
-  palabra.style.animationDuration=(8+Math.random()*10)+"s";
-  document.body.appendChild(palabra);
-
-  setTimeout(()=>{palabra.remove();},15000);
-}
-
-setInterval(crearPalabra,600);
-
+animate();
 </script>
 
 </body>
