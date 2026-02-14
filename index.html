@@ -2,112 +2,164 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Escena 3D - Para Él</title>
+    <title>Escena 3D - Como la Imagen</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #0a0a1a; }
-        #mensaje { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-family: Arial; font-size: 22px; text-shadow: 0 0 10px #4fc3f7; padding: 10px 20px; border-radius: 25px; background: rgba(0,0,0,0.5); }
+        body { margin: 0; overflow: hidden; }
+        #mensajePrincipal { 
+            position: absolute; 
+            top: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            color: #fff; 
+            font-family: Arial; 
+            font-size: 18px; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            background: rgba(0,0,0,0.7); 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div id="mensaje">Te Amo Muchote Mi Rey Fuerte 💙</div>
+    <div id="mensajePrincipal">Te Amo Muchote Mis Ojitos Brillantes 💛</div>
     <script type="importmap">
         {
             "imports": {
-                "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+                "three": "https://unpkg.com/three@0.158.0/build/three.module.js"
             }
         }
     </script>
     <script type="module">
         import * as THREE from 'three';
 
-        // Escena, cámara y renderizador
+        // 1. Configuración básica
         const escena = new THREE.Scene();
+        escena.background = new THREE.Color(0x2b0b42); // Morado oscuro del fondo
+
         const camara = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderizador = new THREE.WebGLRenderer();
+        camara.position.set(0, 5, 15);
+        camara.lookAt(0, 0, 0);
+
+        const renderizador = new THREE.WebGLRenderer({ antialias: true });
         renderizador.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderizador.domElement);
 
-        // Esfera central (representando un "mundo" o objeto focal)
-        const geometriaEsfera = new THREE.SphereGeometry(3, 32, 32);
-        const materialEsfera = new THREE.MeshBasicMaterial({ 
-            color: 0x1976d2, // Azul fuerte
-            wireframe: false, 
-            emissive: 0x0d47a1,
-            emissiveIntensity: 0.5
-        });
-        const esfera = new THREE.Mesh(geometriaEsfera, materialEsfera);
-        escena.add(esfera);
-        esfera.position.y = -2;
-
-        // Partículas/Textos pequeños
-        const textoFrases = [
-            "Mi Todo", "Mi Héroe", "Mi Guerrero", "Me Encantas", 
-            "Mi Sol", "Mi Favorito 😉", "Te Amo 💙", "Unico", 
-            "Mi Campeón", "Mi Vida"
-        ];
-        const grupoParticulas = new THREE.Group();
-        escena.add(grupoParticulas);
-
-        // Crear puntos/textos distribuidos
-        for (let i = 0; i < 200; i++) {
-            // Alternar entre puntos y textos simplificados
-            if (i % 5 === 0) {
-                // Texto (usando geometría básica por simplicidad; para texto real usar FontLoader)
-                const geometriaTexto = new THREE.BoxGeometry(0.5, 0.5, 0.1);
-                const materialTexto = new THREE.MeshBasicMaterial({ 
-                    color: 0x4fc3f7, 
-                    emissive: 0x0288d1
-                });
-                const textoMesh = new THREE.Mesh(geometriaTexto, materialTexto);
-                // Posicionar aleatoriamente
-                textoMesh.position.set(
-                    (Math.random() - 0.5) * 30,
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 30
+        // 2. Estrella del fondo
+        const crearEstrellasFondo = () => {
+            const geometria = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let i = 0; i < 500; i++) {
+                vertices.push(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    -Math.random() * 50
                 );
-                // Asignar texto como etiqueta (visible en consola o con librería de texto)
-                textoMesh.userData.frase = textoFrases[Math.floor(Math.random() * textoFrases.length)];
-                grupoParticulas.add(textoMesh);
-            } else {
-                // Puntos brillantes
-                const geometriaPunto = new THREE.SphereGeometry(0.1, 8, 8);
-                const materialPunto = new THREE.MeshBasicMaterial({ 
-                    color: 0xffffff, 
-                    emissive: 0x4fc3f7
-                });
-                const punto = new THREE.Mesh(geometriaPunto, materialPunto);
-                punto.position.set(
-                    (Math.random() - 0.5) * 30,
-                    (Math.random() - 0.5) * 10,
-                    (Math.random() - 0.5) * 30
-                );
-                grupoParticulas.add(punto);
             }
-        }
+            geometria.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const material = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
+            const estrellas = new THREE.Points(geometria, material);
+            escena.add(estrellas);
+        };
+        crearEstrellasFondo();
 
-        // Luces
-        const luz = new THREE.PointLight(0x4fc3f7, 1.5);
-        luz.position.set(10, 10, 10);
-        escena.add(luz);
-        const luzAmbiente = new THREE.AmbientLight(0x0a2c42, 0.5);
-        escena.add(luzAmbiente);
+        // 3. Superficie iluminada
+        const crearSuperficie = () => {
+            const geometria = new THREE.PlaneGeometry(50, 50);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x5a3b72, 
+                transparent: true, 
+                opacity: 0.8 
+            });
+            const superficie = new THREE.Mesh(geometria, material);
+            superficie.rotation.x = -Math.PI / 2;
+            superficie.position.y = -2;
+            escena.add(superficie);
 
-        // Posicionar cámara
-        camara.position.z = 15;
-        camara.position.y = 2;
+            // Frases y puntos en la superficie
+            const frases = [
+                "Me Encantas", "Mi Todo", "Mi Infinito", "Hermoso ❤️", 
+                "Mi Cielo", "Mi Bebé", "Mi cielo", "Jamasolo", 
+                "Mi Canción Favorita ✨", "Te Amo ❤️", "mi vida", "Unica", 
+                "Mi Amor", "Mi Rei ✨"
+            ];
+            const grupoElementos = new THREE.Group();
+            escena.add(grupoElementos);
 
-        // Animación
+            // Puntos pequeños
+            for (let i = 0; i < 800; i++) {
+                const geoPunto = new THREE.SphereGeometry(0.08, 4, 4);
+                const matPunto = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const punto = new THREE.Mesh(geoPunto, matPunto);
+                punto.position.set(
+                    (Math.random() - 0.5) * 40,
+                    -2,
+                    (Math.random() - 0.5) * 40
+                );
+                grupoElementos.add(punto);
+            }
+
+            // Frases como cajas brillantes
+            for (let frase of frases) {
+                const geoFrase = new THREE.BoxGeometry(
+                    frase.length * 0.3, 
+                    0.5, 
+                    0.1
+                );
+                const matFrase = new THREE.MeshBasicMaterial({ 
+                    color: 0xffffff, 
+                    emissive: 0xffffff,
+                    emissiveIntensity: 0.5
+                });
+                const elementoFrase = new THREE.Mesh(geoFrase, matFrase);
+                elementoFrase.position.set(
+                    (Math.random() - 0.5) * 35,
+                    -1.95,
+                    (Math.random() - 0.5) * 35
+                );
+                elementoFrase.userData.texto = frase; // Para referencia
+                grupoElementos.add(elementoFrase);
+            }
+        };
+        crearSuperficie();
+
+        // 4. Esfera central
+        const crearEsferaCentral = () => {
+            const geometria = new THREE.SphereGeometry(2, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x1a0a2b, 
+                emissive: 0x2b0b42,
+                emissiveIntensity: 0.3
+            });
+            const esfera = new THREE.Mesh(geometria, material);
+            esfera.position.y = -0.5;
+            escena.add(esfera);
+
+            // Partículas alrededor de la esfera
+            const geoParticulas = new THREE.BufferGeometry();
+            const vertices = [];
+            for (let i = 0; i < 100; i++) {
+                const radio = 2 + Math.random() * 1;
+                const angulo = Math.random() * Math.PI * 2;
+                vertices.push(
+                    Math.cos(angulo) * radio,
+                    -0.5 + (Math.random() - 0.5) * 2,
+                    Math.sin(angulo) * radio
+                );
+            }
+            geoParticulas.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const matParticulas = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 });
+            const particulas = new THREE.Points(geoParticulas, matParticulas);
+            escena.add(particulas);
+        };
+        crearEsferaCentral();
+
+        // 5. Animación y ajuste de ventana
         function animar() {
             requestAnimationFrame(animar);
-            // Rotar elementos para dar movimiento
-            esfera.rotation.y += 0.005;
-            grupoParticulas.rotation.y += 0.002;
             renderizador.render(escena, camara);
         }
         animar();
 
-        // Ajustar tamaño con ventana
         window.addEventListener('resize', () => {
             camara.aspect = window.innerWidth / window.innerHeight;
             camara.updateProjectionMatrix();
