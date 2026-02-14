@@ -3,163 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Jairo 🌌</title>
+    <title>Para Jairo</title>
     <style>
-        body { margin: 0; background: #050505; overflow: hidden; font-family: 'Arial', sans-serif; }
+        body { margin: 0; background-color: #000; overflow: hidden; font-family: 'Arial', sans-serif; }
         canvas { display: block; }
 
-        /* Etiqueta superior como en la imagen */
-        .header-tag {
+        /* Mensaje superior flotante */
+        .top-banner {
             position: fixed;
-            top: 20px;
+            top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(40, 0, 80, 0.4);
             backdrop-filter: blur(8px);
-            padding: 8px 20px;
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 25px;
+            border-radius: 40px;
             color: white;
-            z-index: 10;
-            font-size: 14px;
-        }
-
-        /* Reproductor inferior */
-        .music-player {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 380px;
-            background: rgba(20, 20, 20, 0.9);
-            padding: 15px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            z-index: 10;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .btn-elegir {
-            background: #fff;
-            color: #000;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 15px;
-            font-weight: bold;
-            cursor: pointer;
+            border: 1px solid rgba(200, 100, 255, 0.3);
+            z-index: 100;
+            text-align: center;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
         }
     </style>
 </head>
 <body>
 
-    <div class="header-tag">Te Amo Muchote Mi Rey 💛</div>
-
-    <div class="music-player">
-        <div style="font-size: 13px;">
-            <span style="opacity: 0.6;">Elije tu canción</span><br>
-            <strong>Jairo_Mix.mp3</strong> 💙🌹❤️
-        </div>
-        <button class="btn-elegir">Elegir canción</button>
-    </div>
+    <div class="top-banner">Te Amo Muchote Mis Ojitos Mi Rey 💛💛</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
-        let scene, camera, renderer, particles, textGroup;
-        
-        // --- PERSONALIZACIÓN ---
-        const nombreCentral = "JAIRO";
-        const mensajes = [
-            "Mi Rey 👑", "Te admiro", "Mi Caballero", "Mi Vida", 
-            "Mi lugar seguro", "Mi todo", "Eres único", "Mi paz",
-            "Compañero", "Mi orgullo", "Te amo infinito", "Mi Tesoro"
+        let scene, camera, renderer, controls, group;
+
+        const phrases = [
+            "Mi Todo 🌍", "Te Amo", "Mi Paz", "Mi Caballero", "Eres Único", 
+            "Mi Vida", "Te Admiro", "Mi Rey", "Mi Destino", "Mi Tesoro",
+            "Siempre Juntos", "Mi Orgullo", "Te Extraño", "Mi Complemento",
+            "Mi Gran Amor", "Eres Increíble", "Mi Mundo", "Te Elijo Siempre"
         ];
 
         function init() {
             scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 4;
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 12;
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
 
-            // 1. CREAR EL NÚCLEO (ESFERA DE PARTÍCULAS)
-            const geo = new THREE.BufferGeometry();
-            const count = 8000; // Muchos puntos para que se vea denso como la foto
-            const pos = new Float32Array(count * 3);
+            // Controles para mover, rotar y acercar
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
 
-            for(let i = 0; i < count * 3; i++) {
-                pos[i] = (Math.random() - 0.5) * 6;
-            }
-            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            group = new THREE.Group();
+            scene.add(group);
 
-            const mat = new THREE.PointsMaterial({
-                size: 0.015,
-                color: 0xaa88ff, // Color púrpura/azulado de la imagen
-                transparent: true,
-                opacity: 0.8
+            // 1. ESFERA CENTRAL (NÚCLEO NEGRO)
+            const coreGeo = new THREE.SphereGeometry(2, 32, 32);
+            const coreMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            scene.add(core);
+
+            // 2. ARO DE LUZ VIOLETA (EFECTO IMAGEN)
+            const ringGeo = new THREE.TorusGeometry(2.1, 0.05, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xbc13fe });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            scene.add(ring);
+
+            // 3. NOMBRE "JAIRO" EN EL CENTRO
+            const nameCanvas = document.createElement('canvas');
+            const nameCtx = nameCanvas.getContext('2d');
+            nameCanvas.width = 512;
+            nameCanvas.height = 256;
+            nameCtx.fillStyle = 'white';
+            nameCtx.font = 'Bold 100px Arial';
+            nameCtx.textAlign = 'center';
+            nameCtx.fillText('Jairo', 256, 160);
+            const nameTex = new THREE.CanvasTexture(nameCanvas);
+            const nameMat = new THREE.SpriteMaterial({ map: nameTex });
+            const nameSprite = new THREE.Sprite(nameMat);
+            nameSprite.scale.set(3, 1.5, 1);
+            scene.add(nameSprite);
+
+            // 4. NUBE DE MENSAJES ALREDEDOR
+            phrases.forEach((text) => {
+                const textCanvas = document.createElement('canvas');
+                const tCtx = textCanvas.getContext('2d');
+                textCanvas.width = 300;
+                textCanvas.height = 100;
+                tCtx.fillStyle = 'white';
+                tCtx.font = '30px Arial';
+                tCtx.textAlign = 'center';
+                tCtx.fillText(text, 150, 50);
+
+                const texture = new THREE.CanvasTexture(textCanvas);
+                const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+                const sprite = new THREE.Sprite(mat);
+
+                // Posición aleatoria esférica
+                const phi = Math.acos(-1 + (Math.random() * 2));
+                const theta = Math.random() * Math.PI * 2;
+                const r = 5 + Math.random() * 4;
+
+                sprite.position.x = r * Math.sin(phi) * Math.cos(theta);
+                sprite.position.y = r * Math.sin(phi) * Math.sin(theta);
+                sprite.position.z = r * Math.cos(phi);
+                
+                sprite.scale.set(1.5, 0.5, 1);
+                group.add(sprite);
             });
 
-            particles = new THREE.Points(geo, mat);
-            scene.add(particles);
-
-            // 2. AÑADIR EL NOMBRE Y MENSAJES
-            textGroup = new THREE.Group();
-            
-            // Función para crear etiquetas de texto
-            function createText(txt, size, isMain) {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 512;
-                canvas.height = 128;
-                ctx.fillStyle = 'white';
-                ctx.font = isMain ? 'bold 80px Arial' : '30px Arial';
-                ctx.textAlign = 'center';
-                ctx.shadowColor = "rgba(255,255,255,0.5)";
-                ctx.shadowBlur = 10;
-                ctx.fillText(txt, 256, 80);
-
-                const tex = new THREE.CanvasTexture(canvas);
-                const spriteMat = new THREE.SpriteMaterial({ map: tex });
-                const sprite = new THREE.Sprite(spriteMat);
-                sprite.scale.set(1.5, 0.4, 1);
-                return sprite;
-            }
-
-            // Nombre central (Jairo)
-            const mainName = createText(nombreCentral, 80, true);
-            scene.add(mainName);
-
-            // Mensajes flotantes
-            mensajes.forEach(m => {
-                const s = createText(m, 30, false);
-                s.position.set(
-                    (Math.random() - 0.5) * 4,
-                    (Math.random() - 0.5) * 4,
-                    (Math.random() - 0.5) * 4
-                );
-                textGroup.add(s);
-            });
-            scene.add(textGroup);
+            // 5. ESTRELLAS DE FONDO
+            const starGeo = new THREE.BufferGeometry();
+            const starsPos = new Float32Array(2000 * 3);
+            for(let i=0; i<6000; i++) { starsPos[i] = (Math.random() - 0.5) * 40; }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+            const starMat = new THREE.PointsMaterial({ size: 0.05, color: 0xffffff });
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            
-            // Rotación suave del universo
-            particles.rotation.y += 0.001;
-            particles.rotation.x += 0.0005;
-            textGroup.rotation.y -= 0.0015;
-
+            controls.update();
             renderer.render(scene, camera);
         }
 
-        // Ajustar a pantalla si se gira el cel
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
