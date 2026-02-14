@@ -6,155 +6,162 @@
     <title>Para Mi Rey 💙</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
-        body { 
-            overflow: hidden; 
-            background: linear-gradient(#051a3a, #000a1a);
-            position: relative;
-        }
-
-        /* Frases dispersas en el fondo */
-        .bg-text {
+        body { overflow: hidden; background: #0a0a2a; }
+        
+        /* Contenedor principal */
+        #container {
             position: absolute;
-            color: #8ec5fc;
-            text-shadow: 0 0 8px rgba(0,153,255,0.5);
-            animation: drift 20s linear infinite;
-            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-
-        @keyframes drift {
-            0% { transform: translate(0,0) rotate(0deg); opacity: 0.4; }
-            50% { opacity: 0.9; }
-            100% { transform: translate(calc(Math.random()*40px -20px), calc(Math.random()*40px -20px)) rotate(5deg); opacity: 0.4; }
-        }
-
-        /* Título principal */
-        #main-title {
+        
+        /* Círculo negro central */
+        #central-dot {
             position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #fff;
-            font-size: 28px;
-            text-shadow: 0 0 15px #00ccff;
-            z-index: 3;
-        }
-
-        /* Elemento central */
-        #central-element {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 160px;
-            height: 160px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
             background: #000;
-            box-shadow: 0 0 30px rgba(0,153,255,0.6);
-            z-index: 3;
-        }
-
-        /* Anillos alrededor */
-        .ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid rgba(0,153,255,0.4);
-            border-radius: 50%;
-            animation: pulse 6s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(0, 153, 255, 0.5);
             z-index: 2;
         }
-
-        @keyframes pulse {
-            0% { width: 220px; height: 220px; opacity: 0.8; }
-            50% { width: 280px; height: 280px; opacity: 0.3; }
-            100% { width: 220px; height: 220px; opacity: 0.8; }
-        }
-
-        .ring-2 { animation-delay: 2s; }
-        .ring-3 { animation-delay: 4s; }
-
-        /* Reproductor de audio */
-        #player {
+        
+        /* Anillos giratorios */
+        .ring {
             position: absolute;
-            bottom: 5%;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 153, 255, 0.3);
+            animation: rotate 20s linear infinite;
+            z-index: 1;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Frases que giran y cambian de color */
+        .phrase {
+            position: absolute;
+            color: #8ec5fc;
+            font-size: 16px;
+            text-shadow: 0 0 5px rgba(0, 153, 255, 0.5);
+            animation: rotatePhrase 20s linear infinite;
+            z-index: 1;
+            transition: color 0.3s ease;
+        }
+        
+        @keyframes rotatePhrase {
+            from { transform: rotate(0deg) translateX(calc(var(--radius) * 1px)) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(calc(var(--radius) * 1px)) rotate(-360deg); }
+        }
+        
+        /* Reproductor de audio */
+        #audio-player {
+            position: absolute;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
             max-width: 400px;
-            background: rgba(0,51,102,0.8);
-            padding: 10px;
+            background: rgba(0, 51, 102, 0.7);
+            padding: 15px;
             border-radius: 15px;
             z-index: 3;
         }
-
-        #file-picker {
+        
+        #file-input { display: none; }
+        #select-audio {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 8px;
+            padding: 10px;
             background: #0066cc;
             color: #fff;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            text-align: center;
+            margin-bottom: 10px;
         }
-
-        #file-input { display: none; }
-        audio { width: 100%; height: 40px; }
+        
+        audio { width: 100%; }
     </style>
 </head>
 <body>
-    <div id="main-title">Mi Héroe y Mi Mundo 💙</div>
-
-    <!-- Anillos alrededor del elemento central -->
-    <div class="ring" style="width:220px; height:220px;"></div>
-    <div class="ring ring-2" style="width:250px; height:250px;"></div>
-    <div class="ring ring-3" style="width:280px; height:280px;"></div>
-
-    <!-- Elemento central -->
-    <div id="central-element"></div>
-
+    <div id="container"></div>
+    <div id="central-dot"></div>
+    
     <!-- Reproductor de audio -->
-    <div id="player">
-        <button id="file-picker">Seleccionar Canción 🎵</button>
-        <input type="file" id="file-input" accept="audio/*">
-        <audio id="audio-player" controls>
+    <div id="audio-player">
+        <button id="select-audio">Seleccionar tu canción 🎵</button>
+        <input type="file" id="file-input" accept="audio/mp3">
+        <audio id="audio" controls>
     </div>
 
     <script>
-        // Frases para hombre
+        // Configuración de frases y anillos
+        const container = document.getElementById('container');
+        const centralDot = document.getElementById('central-dot');
         const phrases = [
             "Mi Héroe", "Mi Rey", "Mi Guerrero", "Mi Mundo",
-            "Mi Todo", "Mi Calma", "Mi Fuerza", "Mi Paz",
-            "Te Amo 💙", "Campeón", "Mi Eterno", "Mi Refugio",
-            "Mi Cielo", "Mi Bebé", "Unico", "Mi Gran Amor"
+            "Te Amo 💙", "Mi Todo", "Mi Fuerza", "Mi Paz",
+            "Sueños", "Mi Eterno", "Mi Refugio", "Mi Calma",
+            "Mi Estrella", "Mi Inspiración", "Mi Campeón", "Unico",
+            "Mi Vida", "Mi Pasión", "Mi Alegría", "Mi Protector"
         ];
-
-        // Crear frases dispersas en el fondo
-        const body = document.body;
-        phrases.forEach(phrase => {
-            const elem = document.createElement('div');
-            elem.className = 'bg-text';
-            elem.textContent = phrase;
-            elem.style.left = `${Math.random()*100}%`;
-            elem.style.top = `${Math.random()*100}%`;
-            elem.style.fontSize = `${12 + Math.random()*8}px`;
-            elem.style.animationDelay = `${Math.random()*20}s`;
-            body.appendChild(elem);
+        
+        // Crear anillos giratorios
+        const ringCount = 5;
+        for(let i=0; i<ringCount; i++){
+            const radius = 200 + (i * 80);
+            const ring = document.createElement('div');
+            ring.classList.add('ring');
+            ring.style.width = `${radius}px`;
+            ring.style.height = `${radius}px`;
+            ring.style.animationDuration = `${30 - (i * 2)}s`;
+            container.appendChild(ring);
+        }
+        
+        // Crear frases que giran y cambian de color
+        phrases.forEach((text, index) => {
+            const radius = 150 + (index * 20);
+            const phrase = document.createElement('div');
+            phrase.classList.add('phrase');
+            phrase.textContent = text;
+            phrase.style.setProperty('--radius', radius);
+            phrase.style.animation = `rotatePhrase ${25 - (index * 0.5)}s linear infinite`;
+            container.appendChild(phrase);
+            
+            // Cambiar color al pasar por el círculo central
+            setInterval(() => {
+                const rect = phrase.getBoundingClientRect();
+                const dotRect = centralDot.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(rect.left + rect.width/2 - dotRect.left - dotRect.width/2, 2) +
+                    Math.pow(rect.top + rect.height/2 - dotRect.top - dotRect.height/2, 2)
+                );
+                
+                if(distance < 100) {
+                    phrase.style.color = '#ffcc00';
+                } else {
+                    phrase.style.color = '#8ec5fc';
+                }
+            }, 50);
         });
-
-        // Funcionalidad del reproductor
-        const filePicker = document.getElementById('file-picker');
+        
+        // Funcionalidad del reproductor de audio
+        const selectBtn = document.getElementById('select-audio');
         const fileInput = document.getElementById('file-input');
-        const audioPlayer = document.getElementById('audio-player');
-
-        filePicker.addEventListener('click', () => fileInput.click());
+        const audio = document.getElementById('audio');
+        
+        selectBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
-            if(e.target.files[0]){
-                const fileURL = URL.createObjectURL(e.target.files[0]);
-                audioPlayer.src = fileURL;
-                audioPlayer.load();
+            const file = e.target.files[0];
+            if(file) {
+                const url = URL.createObjectURL(file);
+                audio.src = url;
+                selectBtn.textContent = `Canción seleccionada 🎵`;
             }
         });
     </script>
