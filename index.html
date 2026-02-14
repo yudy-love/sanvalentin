@@ -1,153 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Para Jairo ❤️</title>
-<style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:black;
-}
-canvas{display:block;}
-</style>
+    <meta charset="UTF-8">
+    <title>Para Jairo - Galaxia 3D</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: Arial, sans-serif; }
+        #canvas-container { width: 100vw; height: 100vh; }
+        .ui-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff; font-size: 5rem; font-weight: bold;
+            text-shadow: 0 0 20px #ff00de, 0 0 30px #ff00de;
+            pointer-events: none; letter-spacing: 5px;
+        }
+    </style>
 </head>
 <body>
+    <div class="ui-text">JAIRO</div>
+    <div id="canvas-container"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Cargamos Three.js desde un CDN -->
+    <script type="module">
+        import * as THREE from 'https://cdn.skypack.dev';
 
-<script>
-const scene = new THREE.Scene();
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth/window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.z = 10;
+        // Crear partículas estilo galaxia en forma de corazón
+        const particlesCount = 5000;
+        const positions = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
 
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+        for (let i = 0; i < particlesCount; i++) {
+            const t = Math.random() * Math.PI * 2;
+            // Ecuación matemática del corazón
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            const z = (Math.random() - 0.5) * 5; // Grosor 3D
 
-// Luces
-const light = new THREE.PointLight(0xffffff, 2);
-light.position.set(10,10,10);
-scene.add(light);
+            positions[i * 3] = x * 0.5;
+            positions[i * 3 + 1] = y * 0.5;
+            positions[i * 3 + 2] = z;
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-scene.add(ambient);
+            // Colores galaxia (púrpuras, azules, rosas)
+            colors[i * 3] = 0.5 + Math.random() * 0.5; // R
+            colors[i * 3 + 1] = Math.random() * 0.2;   // G
+            colors[i * 3 + 2] = 0.8 + Math.random() * 0.2; // B
+        }
 
-// Corazón forma
-const heartShape = new THREE.Shape();
-heartShape.moveTo(0,0);
-heartShape.bezierCurveTo(0,3,-3,3,-3,0);
-heartShape.bezierCurveTo(-3,-3,0,-3,0,-1);
-heartShape.bezierCurveTo(0,-3,3,-3,3,0);
-heartShape.bezierCurveTo(3,3,0,3,0,0);
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-const extrudeSettings = {
-  depth:2,
-  bevelEnabled:true,
-  bevelSize:0.4,
-  bevelThickness:0.4,
-  bevelSegments:5
-};
+        const material = new THREE.PointsMaterial({
+            size: 0.15,
+            vertexColors: true,
+            transparent: true,
+            blending: THREE.AdditiveBlending
+        });
 
-const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+        const heartPoints = new THREE.Points(geometry, material);
+        scene.add(heartPoints);
 
-// Material galaxia rojo
-const material = new THREE.MeshStandardMaterial({
-  color:0xff0033,
-  roughness:0.3,
-  metalness:0.8,
-  emissive:0x550000,
-  emissiveIntensity:0.8
-});
+        camera.position.z = 20;
 
-const heart = new THREE.Mesh(geometry, material);
-scene.add(heart);
+        // Animación
+        function animate() {
+            requestAnimationFrame(animate);
+            heartPoints.rotation.y += 0.005; // Rotación de la galaxia
+            heartPoints.rotation.z += 0.002;
+            renderer.render(scene, camera);
+        }
 
-// Estrellas pequeñas en el corazón (efecto galaxia)
-const starGeometry = new THREE.BufferGeometry();
-const starCount = 200;
-const positions = [];
+        animate();
 
-for(let i=0;i<starCount;i++){
-  positions.push(
-    (Math.random()-0.5)*6,
-    (Math.random()-0.5)*6,
-    (Math.random()-0.5)*2
-  );
-}
-
-starGeometry.setAttribute(
-  'position',
-  new THREE.Float32BufferAttribute(positions,3)
-);
-
-const starMaterial = new THREE.PointsMaterial({
-  color:0xffffff,
-  size:0.05
-});
-
-const stars = new THREE.Points(starGeometry, starMaterial);
-heart.add(stars);
-
-// Texto Jairo dentro
-const loader = new THREE.FontLoader();
-loader.load(
-'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',
-function(font){
-
-const textGeo = new THREE.TextGeometry("Jairo",{
-  font:font,
-  size:1,
-  height:0.3
-});
-
-textGeo.center();
-
-const textMat = new THREE.MeshStandardMaterial({color:0xffffff});
-const text = new THREE.Mesh(textGeo,textMat);
-text.position.z = 1.2;
-scene.add(text);
-
-// Grupo orbitas
-const orbitGroup = new THREE.Group();
-scene.add(orbitGroup);
-
-for(let i=0;i<12;i++){
-  const orbitGeo = new THREE.TextGeometry("Te amo",{
-    font:font,
-    size:0.5,
-    height:0.1
-  });
-
-  const orbitMat = new THREE.MeshStandardMaterial({color:0xff66aa});
-  const orbitText = new THREE.Mesh(orbitGeo,orbitMat);
-
-  const angle = (i/12)*Math.PI*2;
-  orbitText.position.x = Math.cos(angle)*6;
-  orbitText.position.y = Math.sin(angle)*6;
-
-  orbitGroup.add(orbitText);
-}
-
-function animate(){
-  requestAnimationFrame(animate);
-
-  heart.rotation.y += 0.01;
-  orbitGroup.rotation.y += 0.02;
-
-  renderer.render(scene,camera);
-}
-
-animate();
-
-});
-</script>
-
+        // Ajustar al redimensionar ventana
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 </html>
