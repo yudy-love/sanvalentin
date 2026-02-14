@@ -3,141 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para mi Caballero</title>
+    <title>Para Jairo 🌌</title>
     <style>
-        body { margin: 0; background-color: #000; overflow: hidden; font-family: sans-serif; }
-        #canvas-container { width: 100vw; height: 100vh; }
-        
-        /* Caja de mensaje superior igual a la imagen */
-        .top-message {
+        body { margin: 0; background: #050505; overflow: hidden; font-family: 'Arial', sans-serif; }
+        canvas { display: block; }
+
+        /* Etiqueta superior como en la imagen */
+        .header-tag {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            border-radius: 30px;
+            backdrop-filter: blur(8px);
+            padding: 8px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            z-index: 100;
-            white-space: nowrap;
+            z-index: 10;
+            font-size: 14px;
         }
 
-        /* Reproductor falso en la parte inferior para estética */
-        .player-bar {
+        /* Reproductor inferior */
+        .music-player {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 400px;
-            background: rgba(40, 40, 40, 0.8);
+            max-width: 380px;
+            background: rgba(20, 20, 20, 0.9);
             padding: 15px;
-            border-radius: 15px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             color: white;
-            z-index: 100;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-elegir {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="top-message">Te Amo Muchote Mi Rey 💛</div>
+    <div class="header-tag">Te Amo Muchote Mi Rey 💛</div>
 
-    <div id="canvas-container"></div>
-
-    <div class="player-bar">
-        <div style="font-size: 0.8rem;">
-            <b>Canción para ti</b><br>
-            Nuestra_historia.mp3 💙🌹
+    <div class="music-player">
+        <div style="font-size: 13px;">
+            <span style="opacity: 0.6;">Elije tu canción</span><br>
+            <strong>Jairo_Mix.mp3</strong> 💙🌹❤️
         </div>
-        <button style="background: #fff; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold;">Elegir</button>
+        <button class="btn-elegir">Elegir canción</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        let scene, camera, renderer, cloud;
-        const messages = [
-            "Mi Todo 🌍", "Mi Rey 👑", "El más guapo", "Te Amo", "Mi Paz", 
-            "Mi Caballero", "Eres Único", "Mi Vida", "Te Admiro", "Mi Compañero",
-            "Mi Destino", "Gracias por estar", "Mi Amor Infinito", "Mi Tesoro"
+        let scene, camera, renderer, particles, textGroup;
+        
+        // --- PERSONALIZACIÓN ---
+        const nombreCentral = "JAIRO";
+        const mensajes = [
+            "Mi Rey 👑", "Te admiro", "Mi Caballero", "Mi Vida", 
+            "Mi lugar seguro", "Mi todo", "Eres único", "Mi paz",
+            "Compañero", "Mi orgullo", "Te amo infinito", "Mi Tesoro"
         ];
 
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
+            camera.position.z = 4;
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
 
-            // Crear el núcleo central (la esfera negra de la imagen)
-            const geometry = new THREE.SphereGeometry(0.8, 32, 32);
-            const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
-            const core = new THREE.Mesh(geometry, material);
-            scene.add(core);
+            // 1. CREAR EL NÚCLEO (ESFERA DE PARTÍCULAS)
+            const geo = new THREE.BufferGeometry();
+            const count = 8000; // Muchos puntos para que se vea denso como la foto
+            const pos = new Float32Array(count * 3);
 
-            // Brillo alrededor del núcleo
-            const glowGeo = new THREE.SphereGeometry(0.85, 32, 32);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0x8844ff, transparent: true, opacity: 0.3 });
-            const glow = new THREE.Mesh(glowGeo, glowMat);
-            scene.add(glow);
+            for(let i = 0; i < count * 3; i++) {
+                pos[i] = (Math.random() - 0.5) * 6;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
 
-            // Crear los textos flotantes como partículas
-            cloud = new THREE.Group();
-            
-            messages.forEach((text) => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 256;
-                canvas.height = 64;
-                ctx.fillStyle = 'white';
-                ctx.font = 'Bold 30px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(text, 128, 40);
-
-                const texture = new THREE.CanvasTexture(canvas);
-                const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-                const sprite = new THREE.Sprite(spriteMat);
-
-                // Posición aleatoria en una esfera
-                const phi = Math.acos(-1 + (Math.random() * 2));
-                const theta = Math.random() * Math.PI * 2;
-                const radius = 2 + Math.random() * 2;
-
-                sprite.position.x = radius * Math.sin(phi) * Math.cos(theta);
-                sprite.position.y = radius * Math.sin(phi) * Math.sin(theta);
-                sprite.position.z = radius * Math.cos(phi);
-                
-                sprite.scale.set(1, 0.25, 1);
-                cloud.add(sprite);
+            const mat = new THREE.PointsMaterial({
+                size: 0.015,
+                color: 0xaa88ff, // Color púrpura/azulado de la imagen
+                transparent: true,
+                opacity: 0.8
             });
 
-            scene.add(cloud);
+            particles = new THREE.Points(geo, mat);
+            scene.add(particles);
 
-            // Estrellas de fondo
-            const starGeo = new THREE.BufferGeometry();
-            const starCount = 1000;
-            const posArray = new Float32Array(starCount * 3);
-            for(let i=0; i<starCount*3; i++) { posArray[i] = (Math.random() - 0.5) * 10; }
-            starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            const starMat = new THREE.PointsMaterial({ size: 0.005, color: 0xffffff });
-            const stars = new THREE.Points(starGeo, starMat);
-            scene.add(stars);
+            // 2. AÑADIR EL NOMBRE Y MENSAJES
+            textGroup = new THREE.Group();
+            
+            // Función para crear etiquetas de texto
+            function createText(txt, size, isMain) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 512;
+                canvas.height = 128;
+                ctx.fillStyle = 'white';
+                ctx.font = isMain ? 'bold 80px Arial' : '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = "rgba(255,255,255,0.5)";
+                ctx.shadowBlur = 10;
+                ctx.fillText(txt, 256, 80);
+
+                const tex = new THREE.CanvasTexture(canvas);
+                const spriteMat = new THREE.SpriteMaterial({ map: tex });
+                const sprite = new THREE.Sprite(spriteMat);
+                sprite.scale.set(1.5, 0.4, 1);
+                return sprite;
+            }
+
+            // Nombre central (Jairo)
+            const mainName = createText(nombreCentral, 80, true);
+            scene.add(mainName);
+
+            // Mensajes flotantes
+            mensajes.forEach(m => {
+                const s = createText(m, 30, false);
+                s.position.set(
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 4
+                );
+                textGroup.add(s);
+            });
+            scene.add(textGroup);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            cloud.rotation.y += 0.002; // Hace que los mensajes giren
-            cloud.rotation.x += 0.001;
+            
+            // Rotación suave del universo
+            particles.rotation.y += 0.001;
+            particles.rotation.x += 0.0005;
+            textGroup.rotation.y -= 0.0015;
+
             renderer.render(scene, camera);
         }
 
+        // Ajustar a pantalla si se gira el cel
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
