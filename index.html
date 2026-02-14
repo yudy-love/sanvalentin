@@ -6,8 +6,9 @@
     <title>Te Amo Muchote Mi Rey Fuerte💙</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; background: #0a0a1a; }
-        /* Contenedor del mensaje principal */
+        body { overflow: hidden; }
+        
+        /* Mensaje principal adaptado */
         #main-message {
             position: absolute;
             top: 20px;
@@ -15,42 +16,52 @@
             transform: translateX(-50%);
             color: #fff;
             font-family: Arial;
-            font-size: 18px;
-            padding: 8px 16px;
+            font-size: 16px;
+            padding: 8px 14px;
             border-radius: 20px;
             background: rgba(0,0,0,0.7);
             text-align: center;
             z-index: 2;
         }
-        /* Contenedor del reproductor */
+        
+        /* Reproductor integrado con tonos azules */
         #player-container {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 51, 102, 0.7);
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
             width: 90%;
-            max-width: 400px;
+            max-width: 380px;
             z-index: 2;
+            backdrop-filter: blur(5px);
         }
+        
         #file-input-area {
-            background: #0066cc;
-            padding: 8px;
+            background: rgba(0, 82, 165, 0.9);
+            padding: 7px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             cursor: pointer;
             color: #fff;
             font-family: Arial;
-            font-size: 16px;
+            font-size: 14px;
+            text-align: center;
         }
+        
         #file-input { display: none; }
-        #file-name { text-align: center; }
-        audio { width: 100%; height: 40px; }
-        /* Canvas para el efecto 3D */
-        #scene-canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+        audio { 
+            width: 100%; 
+            height: 35px; 
+            background: rgba(0, 34, 68, 0.9); 
+            border-radius: 5px; 
+            border: none;
+        }
+        
+        /* Canvas del efecto 3D */
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
     </style>
 </head>
 <body>
@@ -61,49 +72,54 @@
             <input type="file" id="file-input" accept="audio/*">
             <span id="file-name">Seleccionar canción 🎵</span>
         </div>
-        <audio id="audio-player" controls>Tu navegador no soporta audio.
+        <audio id="audio-player" controls>Tu navegador no soporta la reproducción de audio.
     </div>
 
-    <canvas id="scene-canvas"></canvas>
+    <canvas id="scene"></canvas>
 
-    <!-- Librería Three.js -->
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.158.0/build/three.module.js" } }
     </script>
     <script type="module">
         import * as THREE from 'three';
 
-        // Configuración de la escena 3D
-        const canvas = document.getElementById('scene-canvas');
+        // Configuración exacta del efecto con tonos adaptados
+        const canvas = document.getElementById('scene');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x2b0b42);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        scene.background = new THREE.Color(0x0a0a1a); // Fondo azul-morado oscuro
 
-        // 1. Estrellas del fondo
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio); // Sin pixelado
+
+        // 1. Estrellas de fondo
         const bgStarsGeo = new THREE.BufferGeometry();
-        const bgStarsVertices = [];
-        for (let i=0; i<500; i++) {
-            bgStarsVertices.push(
-                (Math.random()-0.5)*100,
-                (Math.random()-0.5)*100,
-                -Math.random()*50
+        const bgStarsVerts = [];
+        for (let i=0; i<400; i++) {
+            bgStarsVerts.push(
+                (Math.random()-0.5)*80,
+                (Math.random()-0.5)*80,
+                -Math.random()*40
             );
         }
-        bgStarsGeo.setAttribute('position', new THREE.Float32BufferAttribute(bgStarsVertices, 3));
-        const bgStarsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
+        bgStarsGeo.setAttribute('position', new THREE.Float32BufferAttribute(bgStarsVerts, 3));
+        const bgStarsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.3, sizeAttenuation: true });
         scene.add(new THREE.Points(bgStarsGeo, bgStarsMat));
 
-        // 2. Superficie iluminada con frases
-        const surfaceGeo = new THREE.PlaneGeometry(50, 50);
-        const surfaceMat = new THREE.MeshBasicMaterial({ color: 0x5a3b72, transparent: true, opacity: 0.8 });
+        // 2. Superficie iluminada adaptada
+        const surfaceGeo = new THREE.PlaneGeometry(60, 60);
+        const surfaceMat = new THREE.MeshBasicMaterial({ 
+            color: 0x3a5b72, 
+            transparent: true, 
+            opacity: 0.9 
+        });
         const surface = new THREE.Mesh(surfaceGeo, surfaceMat);
         surface.rotation.x = -Math.PI/2;
-        surface.position.y = -2;
+        surface.position.y = -3;
         scene.add(surface);
 
-        // Frases para hombre
+        // Frases adaptadas para hombre
         const phrases = [
             "Me Encantas", "Mi Todo", "Mi Infinito", "Mi Héroe",
             "Mi Cielo", "Mi Bebé", "Mi Guerrero", "Mi Mundo",
@@ -111,80 +127,87 @@
             "Mi Amor", "Mi Rey ✨"
         ];
 
-        // Grupo de elementos de la superficie
         const surfaceGroup = new THREE.Group();
         scene.add(surfaceGroup);
 
-        // Puntos pequeños
-        for (let i=0; i<800; i++) {
-            const dotGeo = new THREE.SphereGeometry(0.08, 4, 4);
+        // Puntos pequeños brillantes
+        for (let i=0; i<1200; i++) {
+            const dotGeo = new THREE.SphereGeometry(0.05, 8, 8);
             const dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const dot = new THREE.Mesh(dotGeo, dotMat);
             dot.position.set(
-                (Math.random()-0.5)*40,
-                -2,
-                (Math.random()-0.5)*40
+                (Math.random()-0.5)*50,
+                -2.95,
+                (Math.random()-0.5)*50
             );
             surfaceGroup.add(dot);
         }
 
-        // Frases como cajas brillantes
+        // Frases con tamaño y brillo exactos
         for (let phrase of phrases) {
-            const phraseGeo = new THREE.BoxGeometry(phrase.length*0.3, 0.5, 0.1);
-            const phraseMat = new THREE.MeshBasicMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.5 });
+            const phraseGeo = new THREE.PlaneGeometry(phrase.length*0.25, 0.4);
+            const phraseMat = new THREE.MeshBasicMaterial({ 
+                color: 0xffffff, 
+                emissive: 0x4fc3f7, // Brillo azul
+                emissiveIntensity: 0.6
+            });
             const phraseMesh = new THREE.Mesh(phraseGeo, phraseMat);
             phraseMesh.position.set(
-                (Math.random()-0.5)*35,
-                -1.95,
-                (Math.random()-0.5)*35
+                (Math.random()-0.5)*45,
+                -2.9,
+                (Math.random()-0.5)*45
             );
             surfaceGroup.add(phraseMesh);
         }
 
-        // 3. Esfera central
-        const sphereGeo = new THREE.SphereGeometry(2, 32, 32);
-        const sphereMat = new THREE.MeshBasicMaterial({ color: 0x1a0a2b, emissive: 0x2b0b42, emissiveIntensity: 0.3 });
+        // 3. Esfera central adaptada
+        const sphereGeo = new THREE.SphereGeometry(2.5, 64, 64);
+        const sphereMat = new THREE.MeshBasicMaterial({ 
+            color: 0x0a1a2b, 
+            emissive: 0x0a3a5b,
+            emissiveIntensity: 0.2
+        });
         const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-        sphere.position.y = -0.5;
+        sphere.position.y = -1;
         scene.add(sphere);
 
         // Partículas alrededor de la esfera
-        const sphereParticlesGeo = new THREE.BufferGeometry();
-        const sphereParticlesVertices = [];
-        for (let i=0; i<100; i++) {
-            const radius = 2 + Math.random()*1;
+        const spherePartGeo = new THREE.BufferGeometry();
+        const spherePartVerts = [];
+        for (let i=0; i<120; i++) {
+            const radius = 2.5 + Math.random()*1.2;
             const angle = Math.random()*Math.PI*2;
-            sphereParticlesVertices.push(
+            spherePartVerts.push(
                 Math.cos(angle)*radius,
-                -0.5 + (Math.random()-0.5)*2,
+                -1 + (Math.random()-0.5)*2.5,
                 Math.sin(angle)*radius
             );
         }
-        sphereParticlesGeo.setAttribute('position', new THREE.Float32BufferAttribute(sphereParticlesVertices, 3));
-        const sphereParticlesMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 });
-        scene.add(new THREE.Points(sphereParticlesGeo, sphereParticlesMat));
+        spherePartGeo.setAttribute('position', new THREE.Float32BufferAttribute(spherePartVerts, 3));
+        const spherePartMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+        scene.add(new THREE.Points(spherePartGeo, spherePartMat));
 
-        // Posición de la cámara
-        camera.position.set(0, 5, 15);
-        camera.lookAt(0, 0, 0);
+        // Posición de cámara exacta
+        camera.position.set(0, 6, 18);
+        camera.lookAt(0, -1, 0);
 
-        // Animación
+        // Animación suave
         function animate() {
             requestAnimationFrame(animate);
-            surfaceGroup.rotation.y += 0.001;
-            sphere.rotation.y += 0.002;
+            surfaceGroup.rotation.y += 0.0005;
+            sphere.rotation.y += 0.001;
             renderer.render(scene, camera);
         }
         animate();
 
-        // Ajustar tamaño con la ventana
+        // Ajuste al tamaño de pantalla
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth/window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Funcionalidad del reproductor
+        // Funcionalidad del reproductor de audio
         const fileInput = document.getElementById('file-input');
         const fileName = document.getElementById('file-name');
         const audioPlayer = document.getElementById('audio-player');
@@ -199,6 +222,7 @@
             }
         });
 
+        // Abrir selector al hacer clic
         document.getElementById('file-input-area').addEventListener('click', () => fileInput.click());
     </script>
 </body>
