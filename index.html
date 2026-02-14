@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Ti 💜</title>
+
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  background: radial-gradient(circle at center, #1a002b, #000);
+  font-family: Arial, sans-serif;
+}
+
+h1{
+  position:absolute;
+  width:100%;
+  text-align:center;
+  top:40%;
+  color:white;
+  font-size:30px;
+  text-shadow:0 0 20px #ff4dff;
+  pointer-events:none;
+}
+
+.corazon{
+  position:absolute;
+  font-size:24px;
+  cursor:pointer;
+  user-select:none;
+  transition: transform 0.2s;
+}
+
+.corazon:active{
+  transform: scale(1.5);
+}
+</style>
+</head>
+
+<body>
+
+<h1>Feliz San Valentín 💜</h1>
+
+<script>
+function crearCorazon(x,y){
+  const corazon=document.createElement("div");
+  corazon.className="corazon";
+  corazon.innerHTML="💜";
+  corazon.style.left=x+"px";
+  corazon.style.top=y+"px";
+  
+  corazon.onmousedown=function(){
+    let shiftX = event.clientX - corazon.getBoundingClientRect().left;
+    let shiftY = event.clientY - corazon.getBoundingClientRect().top;
+
+    function mover(e){
+      corazon.style.left = e.pageX - shiftX + "px";
+      corazon.style.top = e.pageY - shiftY + "px";
+    }
+
+    document.addEventListener("mousemove", mover);
+
+    corazon.onmouseup=function(){
+      document.removeEventListener("mousemove", mover);
+    };
+  };
+
+  document.body.appendChild(corazon);
+}
+
+document.addEventListener("click", function(e){
+  crearCorazon(e.pageX, e.pageY);
+});
+</script>
+
+</body>
+</html>
