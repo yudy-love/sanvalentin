@@ -3,75 +3,99 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para Ti 💜</title>
+<title>Mi Universo 💜</title>
 
 <style>
 body{
   margin:0;
   overflow:hidden;
-  background: radial-gradient(circle at center, #1a002b, #000);
+  background: black;
   font-family: Arial, sans-serif;
+  color:white;
 }
 
-h1{
+/* Estrellas */
+.star{
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:white;
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle{
+  from{opacity:0.2;}
+  to{opacity:1;}
+}
+
+/* Mensaje */
+.mensaje{
   position:absolute;
   width:100%;
   text-align:center;
-  top:40%;
-  color:white;
-  font-size:30px;
-  text-shadow:0 0 20px #ff4dff;
-  pointer-events:none;
+  top:35%;
+  font-size:22px;
+  padding:20px;
+  text-shadow:0 0 15px purple;
 }
 
+/* Corazones */
 .corazon{
   position:absolute;
-  font-size:24px;
-  cursor:pointer;
-  user-select:none;
-  transition: transform 0.2s;
+  font-size:28px;
+  animation: flotar 4s linear forwards;
 }
 
-.corazon:active{
-  transform: scale(1.5);
+@keyframes flotar{
+  from{transform:translateY(0); opacity:1;}
+  to{transform:translateY(-200px); opacity:0;}
 }
 </style>
 </head>
 
 <body>
 
-<h1>Feliz San Valentín 💜</h1>
+<div class="mensaje">
+Te amo mi esposito hermoso 💜✨<br>
+Eres mi universo entero 🌌<br>
+Feliz San Valentín 💕
+</div>
 
 <script>
+
+/* Crear estrellas */
+for(let i=0;i<120;i++){
+  const star=document.createElement("div");
+  star.className="star";
+  star.style.left=Math.random()*100+"vw";
+  star.style.top=Math.random()*100+"vh";
+  star.style.animationDuration=(1+Math.random()*3)+"s";
+  document.body.appendChild(star);
+}
+
+/* Corazones al tocar */
 function crearCorazon(x,y){
   const corazon=document.createElement("div");
   corazon.className="corazon";
   corazon.innerHTML="💜";
   corazon.style.left=x+"px";
   corazon.style.top=y+"px";
-  
-  corazon.onmousedown=function(){
-    let shiftX = event.clientX - corazon.getBoundingClientRect().left;
-    let shiftY = event.clientY - corazon.getBoundingClientRect().top;
-
-    function mover(e){
-      corazon.style.left = e.pageX - shiftX + "px";
-      corazon.style.top = e.pageY - shiftY + "px";
-    }
-
-    document.addEventListener("mousemove", mover);
-
-    corazon.onmouseup=function(){
-      document.removeEventListener("mousemove", mover);
-    };
-  };
-
   document.body.appendChild(corazon);
+
+  setTimeout(()=>{
+    corazon.remove();
+  },4000);
 }
 
-document.addEventListener("click", function(e){
-  crearCorazon(e.pageX, e.pageY);
+document.addEventListener("touchstart", function(e){
+  const toque=e.touches[0];
+  crearCorazon(toque.pageX,toque.pageY);
 });
+
+document.addEventListener("click", function(e){
+  crearCorazon(e.pageX,e.pageY);
+});
+
 </script>
 
 </body>
