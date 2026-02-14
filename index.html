@@ -10,10 +10,9 @@
             padding: 0;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
-            color: #fff;
         }
         body {
-            background-color: #0a0a1a;
+            background-color: #00001a;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -23,42 +22,60 @@
             text-align: center;
         }
         h1 {
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px #4fc3f7;
+            color: #ffffff;
+            font-size: 28px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px #0099ff;
         }
         .credits {
-            font-size: 16px;
-            margin-bottom: 20px;
-            opacity: 0.8;
+            color: #ccccff;
+            font-size: 18px;
+            margin-bottom: 30px;
         }
-        .player-section {
-            background-color: rgba(25, 118, 210, 0.2);
+        .player-container {
+            background-color: rgba(0, 51, 102, 0.7);
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
-            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
+            width: 100%;
+            max-width: 450px;
+            margin-bottom: 25px;
         }
         .player-label {
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-        input[type="file"] {
-            background-color: #1976d2;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
+            color: #ffffff;
+            font-size: 20px;
             margin-bottom: 20px;
+        }
+        #file-input-area {
+            background-color: #0066cc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #file-input-area:hover {
+            background-color: #0099ff;
+        }
+        #file-input {
+            display: none; /* Ocultar el input original feo */
+        }
+        #file-name {
+            color: #ffffff;
+            font-size: 16px;
         }
         audio {
             width: 100%;
-            max-width: 400px;
-            outline: none;
+            height: 50px;
+            background-color: #00001a;
+            border-radius: 8px;
+            padding: 5px;
         }
         .details {
-            font-size: 16px;
+            color: #ffffff;
+            font-size: 18px;
             font-weight: bold;
-            text-shadow: 0 0 5px #4fc3f7;
+            text-shadow: 0 0 10px #0099ff;
         }
     </style>
 </head>
@@ -66,37 +83,49 @@
     <h1>Te Amo Muchote Mi Rey Fuerte💙</h1>
     
     <div class="credits">
-        Base: tlanex · Adaptación para [Jairo] 💫
+        Base: tlanex · Adaptación para Jairo 🤙
     </div>
 
-    <div class="player-section">
+    <div class="player-container">
         <div class="player-label">Elije tu canción 🎵</div>
-        <input type="file" id="songSelector" accept="audio/mp3">
-        <audio id="audioPlayer" controls>
-            Tu navegador no soporta el elemento de audio.
+        
+        <!-- Área de selección de archivo bonita -->
+        <div id="file-input-area">
+            <input type="file" id="file-input" accept="audio/*">
+            <span id="file-name">Seleccionar archivo de audio</span>
+        </div>
+
+        <!-- Reproductor de audio completo -->
+        <audio id="audio-player" controls>
+            Tu navegador no soporta la reproducción de audio.
         
     </div>
 
     <div class="details">
-        Detalles Sr 💙⚔️♥️ (Reproductor Sr)
+        Detalles Sr 💙⚔️❤️ (Reproductor Sr)
     </div>
 
     <script>
-        // Obtener elementos del DOM
-        const songSelector = document.getElementById('songSelector');
-        const audioPlayer = document.getElementById('audioPlayer');
+        const fileInput = document.getElementById('file-input');
+        const fileName = document.getElementById('file-name');
+        const audioPlayer = document.getElementById('audio-player');
 
-        // Cargar canción seleccionada
-        songSelector.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const fileURL = URL.createObjectURL(file);
+        // Actualizar texto cuando se selecciona un archivo
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                fileName.textContent = e.target.files[0].name;
+                const fileURL = URL.createObjectURL(e.target.files[0]);
                 audioPlayer.src = fileURL;
                 audioPlayer.load();
-                audioPlayer.play().catch(err => {
-                    console.log('No se pudo reproducir automáticamente:', err);
-                });
+            } else {
+                fileName.textContent = "Seleccionar archivo de audio";
+                audioPlayer.src = "";
             }
+        });
+
+        // Abrir el selector al hacer clic en el área
+        document.getElementById('file-input-area').addEventListener('click', function() {
+            fileInput.click();
         });
     </script>
 </body>
