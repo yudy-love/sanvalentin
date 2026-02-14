@@ -9,92 +9,77 @@
 body{
   margin:0;
   overflow:hidden;
-  background: black;
+  background: radial-gradient(circle at center, #2b0050, #000000);
   font-family: Arial, sans-serif;
   color:white;
 }
 
-/* Estrellas */
-.star{
+/* Mensaje superior */
+.titulo{
   position:absolute;
-  width:2px;
-  height:2px;
-  background:white;
-  animation: twinkle 2s infinite alternate;
-}
-
-@keyframes twinkle{
-  from{opacity:0.2;}
-  to{opacity:1;}
-}
-
-/* Mensaje */
-.mensaje{
-  position:absolute;
+  top:20px;
   width:100%;
   text-align:center;
-  top:35%;
   font-size:22px;
-  padding:20px;
-  text-shadow:0 0 15px purple;
+  background:rgba(255,255,255,0.1);
+  padding:10px;
+  border-radius:20px;
 }
 
-/* Corazones */
-.corazon{
+/* Palabras flotando */
+.palabra{
   position:absolute;
-  font-size:28px;
-  animation: flotar 4s linear forwards;
+  font-size:14px;
+  opacity:0.8;
+  animation: flotar linear infinite;
 }
 
 @keyframes flotar{
-  from{transform:translateY(0); opacity:1;}
-  to{transform:translateY(-200px); opacity:0;}
+  from{
+    transform: translateY(100vh);
+  }
+  to{
+    transform: translateY(-10vh);
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="mensaje">
-Te amo mi esposito hermoso 💜✨<br>
-Eres mi universo entero 🌌<br>
-Feliz San Valentín 💕
+<div class="titulo">
+Te amo mi esposito hermoso 💜✨
 </div>
 
 <script>
 
-/* Crear estrellas */
-for(let i=0;i<120;i++){
-  const star=document.createElement("div");
-  star.className="star";
-  star.style.left=Math.random()*100+"vw";
-  star.style.top=Math.random()*100+"vh";
-  star.style.animationDuration=(1+Math.random()*3)+"s";
-  document.body.appendChild(star);
-}
+const palabras = [
+"Mi Amor 💜",
+"Mi Vida 💕",
+"Mi Rey 👑",
+"Mi Universo 🌌",
+"Mi Corazón 💖",
+"Mi Todo ✨",
+"Único 💛",
+"Mi Cielo 🌙",
+"Mi Tesoro 💎",
+"Siempre Tú 💞"
+];
 
-/* Corazones al tocar */
-function crearCorazon(x,y){
-  const corazon=document.createElement("div");
-  corazon.className="corazon";
-  corazon.innerHTML="💜";
-  corazon.style.left=x+"px";
-  corazon.style.top=y+"px";
-  document.body.appendChild(corazon);
+function crearPalabra(){
+  const palabra=document.createElement("div");
+  palabra.className="palabra";
+  palabra.innerText=palabras[Math.floor(Math.random()*palabras.length)];
+  palabra.style.left=Math.random()*100+"vw";
+  palabra.style.animationDuration=(10+Math.random()*15)+"s";
+  document.body.appendChild(palabra);
 
   setTimeout(()=>{
-    corazon.remove();
-  },4000);
+    palabra.remove();
+  },20000);
 }
 
-document.addEventListener("touchstart", function(e){
-  const toque=e.touches[0];
-  crearCorazon(toque.pageX,toque.pageY);
-});
-
-document.addEventListener("click", function(e){
-  crearCorazon(e.pageX,e.pageY);
-});
+setInterval(crearPalabra,500);
 
 </script>
 
