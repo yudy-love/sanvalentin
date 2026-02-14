@@ -1,123 +1,72 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Mi Rey 💙</title>
+    <title>Mi Galaxia 3D</title>
+    <script src="https://www.goat1000.com/tagcanvas.min.js" type="text/javascript"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            overflow: hidden; 
-            background: #101030; 
-            width: 100vw; 
+        body {
+            background-color: #000; /* Fondo negro como el espacio */
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
+            font-family: Arial, sans-serif;
         }
-
-        #center-circle {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: #000;
-            box-shadow: 0 0 30px #00aaff;
-            z-index: 2;
+        #myCanvasContainer {
+            position: relative;
         }
-
-        #phrases {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        canvas {
+            cursor: move;
         }
-
-        .word {
-            position: absolute;
-            color: #a0e0ff;
-            font-family: Arial;
-            font-size: 14px;
-            animation: spin 20s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        #player {
-            position: absolute;
-            bottom: 20px;
-            left: 5%;
-            width: 90%;
-            background: #0055aa;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        #choose {
-            width: 100%;
-            padding: 8px;
-            background: #a0e0ff;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            cursor: pointer;
-        }
-
-        #file { display: none; }
-        audio { width: 100%; }
     </style>
 </head>
 <body>
-    <div id="center-circle"></div>
-    <div id="phrases"></div>
 
-    <div id="player">
-        <button id="choose">Seleccionar Canción 🎵</button>
-        <input type="file" id="file" accept="audio/*">
-        <audio controls>
+    <div id="myCanvasContainer">
+        <canvas width="600" height="600" id="myCanvas">
+            <p>Tu navegador no soporta Canvas.</p>
+            <ul>
+                <li><a href="#" style="color: #FF4500; font-size: 25pt;">Mi Vida</a></li>
+                <li><a href="#" style="color: #FFD700;">Amanecer</a></li>
+                <li><a href="#" style="color: #FFFFFF;">Eternidad</a></li>
+                <li><a href="#" style="color: #FF69B4;">Te Amo</a></li>
+                <li><a href="#" style="color: #00FF00;">Felicidad</a></li>
+                <li><a href="#" style="color: #1E90FF;">Mi Cielo</a></li>
+                <li><a href="#" style="color: #FFA500;">Ternura</a></li>
+                <li><a href="#" style="color: #FF0000;">Pasión</a></li>
+                <li><a href="#" style="color: #DA70D6;">Sueños</a></li>
+                <li><a href="#" style="color: #FFFFFF;">Destino</a></li>
+                <li><a href="#" style="color: #FFD700;">Siempre Tú</a></li>
+                <li><a href="#" style="color: #FF4500;">Mi Sol</a></li>
+                <li><a href="#" style="color: #00FFFF;">Inspiración</a></li>
+                <li><a href="#" style="color: #FF1493;">Corazón</a></li>
+                <li><a href="#" style="color: #FFFFFF;">Magia</a></li>
+            </ul>
+        </canvas>
     </div>
 
-    <script>
-        const words = [
-            "Mi Héroe", "Mi Rey", "Mi Guerrero", "Mi Mundo",
-            "Te Amo", "Mi Todo", "Mi Fuerza", "Mi Paz",
-            "Sueños", "Mi Eterno", "Mi Refugio", "Mi Calma"
-        ];
-
-        const phrases = document.getElementById('phrases');
-        const center = {x: window.innerWidth/2, y: window.innerHeight/3};
-
-        words.forEach((text, i) => {
-            const word = document.createElement('div');
-            word.className = 'word';
-            word.textContent = text;
-            const radius = 100 + i*30;
-            let angle = 0;
-
-            setInterval(() => {
-                angle += 0.01;
-                const x = center.x + Math.cos(angle)*radius;
-                const y = center.y + Math.sin(angle)*radius;
-                word.style.left = x + 'px';
-                word.style.top = y + 'px';
-                
-                const dist = Math.hypot(x - center.x, y - center.y);
-                if(dist < 80) word.style.color = '#ffff00';
-                else word.style.color = '#a0e0ff';
-
-            }, 20);
-            phrases.appendChild(word);
-        });
-
-        document.getElementById('choose').onclick = () => document.getElementById('file').click();
-        document.getElementById('file').onchange = (e) => {
-            const file = e.target.files[0];
-            if(file) document.querySelector('audio').src = URL.createObjectURL(file);
+    <script type="text/javascript">
+        window.onload = function() {
+            try {
+                TagCanvas.Start('myCanvas', '', {
+                    textColour: null, // Usa el color definido en el HTML
+                    outlineColour: 'transparent',
+                    reverse: true,
+                    depth: 0.8,
+                    maxSpeed: 0.05,
+                    textFont: 'Georgia, serif',
+                    weight: true,
+                    wheelZoom: true, // Puedes hacer zoom con el ratón
+                    initial: [0.1, -0.1], // Velocidad inicial de rotación
+                    decel: 0.98,
+                    activeCursor: 'pointer'
+                });
+            } catch(e) {
+                // Si algo falla, el canvas no se verá
+                document.getElementById('myCanvasContainer').style.display = 'none';
+            }
         };
     </script>
 </body>
